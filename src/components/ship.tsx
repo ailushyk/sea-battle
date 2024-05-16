@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Orientation, ShipType, ShipValue } from '@/lib/game'
 import { cn } from '@/lib/utils'
+import { Orientation, ShipType, ShipValue } from '@/types'
 
 export function Ship({
   ship,

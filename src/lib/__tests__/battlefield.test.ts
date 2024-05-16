@@ -1,11 +1,13 @@
 import {
   addShipToGrid,
+  generateRandomGrid,
   initBattlefield,
   previewShipPosition,
   removeShipFromGrid,
   resetGridValidation,
 } from '@/lib/battlefield'
-import { Orientation, ShipType, ShipValue } from '@/lib/game'
+import { ships } from '@/lib/game'
+import { Orientation, ShipType, ShipValue } from '@/types'
 
 export function createHorizontalBattleship(): ShipValue {
   return {
@@ -229,5 +231,27 @@ describe('init-battlefield', () => {
       },
       validation: null,
     })
+  })
+
+  it('generateRandomGrid returns correct grid', () => {
+    const rows = 10
+    const cols = 10
+    const grid = generateRandomGrid({ rows, cols })
+
+    // Check if the grid has the correct size
+    expect(grid.length).toBe(rows)
+    expect(grid[0].length).toBe(cols)
+
+    // Check if the grid contains the correct number of ships
+    let shipCount = 0
+    grid.forEach((row) => {
+      row.forEach((cell) => {
+        if (cell.ship) {
+          shipCount++
+        }
+      })
+    })
+    const totalShipSize = ships.reduce((total, ship) => total + ship.size, 0)
+    expect(shipCount).toBe(totalShipSize)
   })
 })

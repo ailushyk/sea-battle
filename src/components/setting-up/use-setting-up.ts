@@ -7,8 +7,8 @@ import {
   removeShipFromGrid,
   resetGridValidation,
 } from '@/lib/battlefield'
-import { Cell, Orientation, Position, ShipValue } from '@/lib/game'
-import { validateShipPosition } from '@/lib/validate-field'
+import { validateShipPosition } from '@/lib/ship-utils'
+import { Cell, Orientation, Position, ShipValue } from '@/types'
 
 export function useSettingUp({ rows, cols }: { rows: number; cols: number }) {
   const [currentShip, setCurrentShip] = useState<ShipValue | null>(null)

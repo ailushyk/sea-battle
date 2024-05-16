@@ -1,15 +1,8 @@
-import { Orientation, Position, ships, ShipType } from '@/lib/game'
-import { getCellId } from '@/lib/ship-utils'
+import { getGameKey, ships } from '@/lib/game'
+import { User } from '@/lib/user'
+import { Orientation, ShipType } from '@/types'
 
-describe('game.ts', () => {
-  it('has correct ship types', () => {
-    expect(ShipType.Carrier).toBe(5)
-    expect(ShipType.Battleship).toBe(4)
-    expect(ShipType.Cruiser).toBe(3)
-    expect(ShipType.Submarine).toBe(3)
-    expect(ShipType.Destroyer).toBe(2)
-  })
-
+describe('game.actions.ts', () => {
   it('has correct ships array', () => {
     expect(ships).toEqual([
       {
@@ -45,35 +38,11 @@ describe('game.ts', () => {
     ])
   })
 
-  it('getCellId returns correct id', () => {
-    const position: Position = {
-      row: 2,
-      col: 3,
-    }
-    const id = getCellId(position)
-    expect(id).toBe('2-3')
-  })
+  it('getGameKey returns correct key', () => {
+    const user: User = { id: '123' }
+    const subKey = 'subKeyTest'
 
-  it('getCellId returns uncorrect id', () => {
-    const position: Position = {
-      row: 2,
-      col: 3,
-    }
-    const id = getCellId(position)
-    expect(id).not.toBe('3-3')
-  })
-
-  it('Cell has correct id', () => {
-    const position = {
-      row: 3,
-      col: 5,
-    }
-    const cell = {
-      id: getCellId(position),
-      ship: null,
-      hit: null,
-      position,
-    }
-    expect(cell.id).toBe('3-5')
+    expect(getGameKey({ user })).toBe(`sb:game:${user.id}`)
+    expect(getGameKey({ user }, subKey)).toBe(`sb:game:${user.id}:${subKey}`)
   })
 })

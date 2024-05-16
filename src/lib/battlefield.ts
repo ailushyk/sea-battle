@@ -1,6 +1,15 @@
-import { Cell, Position, ShipValue } from '@/lib/game'
-import { getCellId, getShipCellIds } from '@/lib/ship-utils'
-import { validateShipPosition } from '@/lib/validate-field'
+import { ships } from '@/lib/game'
+import {
+  getCellId,
+  getShipCellIds,
+  validateShipPosition,
+} from '@/lib/ship-utils'
+import { Cell, Grid, Orientation, Position, ShipValue } from '@/types'
+
+export const battlefieldConfig = {
+  rows: 10,
+  cols: 10,
+}
 
 export function initBattlefield(rows: number, cols: number): Cell[][] {
   return Array.from({ length: rows }, (_, row) =>
@@ -107,4 +116,44 @@ export function removeShipFromGrid({
       return col
     }),
   )
+}
+
+function placeShipOnGrid(grid: Cell[][], ship: ShipValue): Cell[][] {
+  for (let i = 0; i < 100; i++) {
+    // limit the number of attempts to 100
+    const position = {
+      row: Math.floor(Math.random() * grid.length),
+      col: Math.floor(Math.random() * grid[0].length),
+    }
+    const validation = validateShipPosition({ grid, ship, position })
+    if (validation) {
+      return addShipToGrid({ grid, ship, position })
+    }
+  }
+  return grid // return the original grid if the ship couldn't be placed
+}
+
+export function generateRandomGrid({
+  rows,
+  cols,
+}: {
+  rows: number
+  cols: number
+}): Cell[][] {
+  return ships.reduce(
+    (grid, ship) => {
+      return placeShipOnGrid(grid, ship)
+    },
+    initBattlefield(rows, cols),
+  )
+}
+
+export function hitCell(grid: Grid, position: Position) {
+  const cell = grid[position.row][position.col]
+  if (cell.ship) {
+    grid[position.row][position.col].hit = 'hit'
+  } else {
+    grid[position.row][position.col].hit = 'miss'
+  }
+  return grid
 }

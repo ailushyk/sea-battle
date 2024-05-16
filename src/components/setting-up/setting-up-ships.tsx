@@ -1,16 +1,20 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 
+import { battlefieldConfig, generateRandomGrid } from '@/lib/battlefield'
 import { ships } from '@/lib/game'
 import { cn } from '@/lib/utils'
+import { startGameAction } from '@/actions/game.actions'
 import { BattleField } from '@/components/battle-field'
 import { PreviewSelectedShip } from '@/components/setting-up/preview-selected-ship'
 import { useSettingUp } from '@/components/setting-up/use-setting-up'
 import { Ship, ShipLabel } from '@/components/ship'
 import { Button } from '@/components/ui/button'
 
-export function SettingUpShips({ rows, cols }: { rows: number; cols: number }) {
+export function SettingUpShips() {
+  const router = useRouter()
   const {
     grid,
     currentShip,
@@ -22,10 +26,7 @@ export function SettingUpShips({ rows, cols }: { rows: number; cols: number }) {
     removeShip,
     reset,
     resetValidation,
-  } = useSettingUp({
-    rows,
-    cols,
-  })
+  } = useSettingUp(battlefieldConfig)
 
   return (
     <div className="space-y-8">
@@ -75,7 +76,15 @@ export function SettingUpShips({ rows, cols }: { rows: number; cols: number }) {
         <Button size="lg" variant="destructive" onClick={reset}>
           Reset
         </Button>
-        <Button size="lg" disabled={selected.length !== ships.length}>
+        <Button
+          size="lg"
+          disabled={selected.length !== ships.length}
+          onClick={async () => {
+            console.log('use server')
+            await startGameAction({ grid })
+            router.push('/playground')
+          }}
+        >
           Start
         </Button>
       </div>

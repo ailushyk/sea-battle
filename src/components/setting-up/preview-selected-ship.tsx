@@ -1,5 +1,5 @@
-import { ShipValue } from '@/lib/game'
 import { Ship, ShipLabel } from '@/components/ship'
+import { ShipValue } from '@/types'
 
 export function PreviewSelectedShip({
   ship,

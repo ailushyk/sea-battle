@@ -1,67 +1,5 @@
-export enum ShipType {
-  Carrier = 5,
-  Battleship = 4,
-  Cruiser = 3,
-  Submarine = 3,
-  Destroyer = 2,
-}
-
-export enum Orientation {
-  Horizontal,
-  Vertical,
-}
-
-export type Position = {
-  row: number
-  col: number
-}
-
-export type Cell = {
-  id: string
-  position: Position
-  ship: string | null // ship id
-  hit: 'hit' | 'miss' | null
-  validation?: 'valid' | 'invalid' | null
-}
-
-export type ShipValue = {
-  id: string
-  type: ShipType
-  size: number
-  positions?: Position[]
-  orientation: Orientation
-  cells?: Cell[]
-  hits?: boolean[]
-}
-
-type GameState = {
-  players: Player[]
-  status: 'idle' | 'started' | 'finished'
-  turn: string
-  config: {
-    x: number
-    y: number
-    ships: ShipValue[]
-  }
-  battlefield: Cell[][]
-  shoots: {
-    player: string
-    position: Position
-    result: 'hit' | 'miss'
-  }[]
-}
-
-type Player = {
-  id: string
-  name: string
-  ships: ShipPlacement[]
-}
-
-interface ShipPlacement extends ShipValue {
-  position: Position
-  direction: 'horizontal' | 'vertical'
-  status: 'idle' | 'sunk' | 'hit'
-}
+import { User } from '@/lib/user'
+import { Cell, Orientation, Position, ShipType, ShipValue } from '@/types'
 
 export const ships: ShipValue[] = [
   {
@@ -95,3 +33,9 @@ export const ships: ShipValue[] = [
     orientation: Orientation.Horizontal,
   },
 ]
+
+export const getGameKey = ({ user }: { user: User }, subKey?: string) => {
+  //TODO: use game id instead of user id
+  const key = `sb:game:${user.id}`
+  return subKey ? `${key}:${subKey}` : key
+}

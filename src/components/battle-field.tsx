@@ -1,22 +1,28 @@
-import { resetGridValidation } from '@/lib/battlefield'
-import { Cell, Position } from '@/lib/game'
+'use client'
+
+import { useOptimistic, useTransition } from 'react'
+
+import { hitCell } from '@/lib/battlefield'
 import { cn } from '@/lib/utils'
+import { Cell, Grid, Position } from '@/types'
 
 export function BattleField({
   grid,
+  hideShips,
   onClick,
   onHover,
   onBlur,
 }: {
   grid: Cell[][]
-  onClick({ position }: { position: Position }): void
+  hideShips?: boolean
+  onClick?({ position }: { position: Position }): void
   onHover?({ position }: { position: Position }): void
   onBlur?(): void
 }) {
   return (
     <div className="flex gap-4">
       <div>
-        <BattleFieldColsHeader cols={grid.length} />
+        <BattleFieldColsHeader cols={grid[0]?.length} />
 
         {grid.map((_cols, _row) => (
           <div key={`row-${_row}`} className="flex">
@@ -26,18 +32,19 @@ export function BattleField({
               {_cols.map((cell, _col) => (
                 <button
                   key={`col-${cell.id}`}
+                  disabled={!onClick}
                   onClick={() => {
-                    onClick({ position: cell.position })
+                    onClick?.({ position: cell.position })
                   }}
                   onMouseEnter={() => {
-                    onHover && onHover({ position: cell.position })
+                    onHover?.({ position: cell.position })
                   }}
                   className={cn(
                     'flex h-8 w-8 items-center justify-center border text-gray-200',
                     {
-                      'border-blue-500 bg-blue-500/70': cell.ship,
+                      'border-blue-500 bg-blue-500/70': !hideShips && cell.ship,
                       'bg-red-500': cell.hit === 'hit',
-                      'bg-gray-200/30': cell.hit === 'miss',
+                      'bg-gray-300/30': cell.hit === 'miss',
                       'border-green-600 bg-green-300/30':
                         cell.validation === 'valid',
                       'border-red-300 bg-red-300/30':
