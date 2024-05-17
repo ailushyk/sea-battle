@@ -1,12 +1,10 @@
 import {
+  addPreviewShipPosition,
   addShipToGrid,
-  generateRandomGrid,
   initBattlefield,
-  previewShipPosition,
   removeShipFromGrid,
   resetGridValidation,
 } from '@/lib/battlefield'
-import { ships } from '@/lib/game'
 import { Orientation, ShipType, ShipValue } from '@/types'
 
 export function createHorizontalBattleship(): ShipValue {
@@ -15,6 +13,7 @@ export function createHorizontalBattleship(): ShipValue {
     type: ShipType.Battleship,
     size: ShipType.Battleship,
     orientation: Orientation.Horizontal,
+    positions: [],
   }
 }
 
@@ -24,6 +23,7 @@ export function createVerticalBattleship(): ShipValue {
     type: ShipType.Battleship,
     size: ShipType.Battleship,
     orientation: Orientation.Vertical,
+    positions: [],
   }
 }
 
@@ -164,7 +164,7 @@ describe('init-battlefield', () => {
       row: 0,
       col: 0,
     }
-    const gridWithShip = previewShipPosition({
+    const gridWithShip = addPreviewShipPosition({
       grid,
       ship,
       position,
@@ -183,7 +183,7 @@ describe('init-battlefield', () => {
       row: 0,
       col: 8,
     }
-    const gridWithShip = previewShipPosition({
+    const gridWithShip = addPreviewShipPosition({
       grid,
       ship,
       position,
@@ -231,27 +231,5 @@ describe('init-battlefield', () => {
       },
       validation: null,
     })
-  })
-
-  it('generateRandomGrid returns correct grid', () => {
-    const rows = 10
-    const cols = 10
-    const grid = generateRandomGrid({ rows, cols })
-
-    // Check if the grid has the correct size
-    expect(grid.length).toBe(rows)
-    expect(grid[0].length).toBe(cols)
-
-    // Check if the grid contains the correct number of ships
-    let shipCount = 0
-    grid.forEach((row) => {
-      row.forEach((cell) => {
-        if (cell.ship) {
-          shipCount++
-        }
-      })
-    })
-    const totalShipSize = ships.reduce((total, ship) => total + ship.size, 0)
-    expect(shipCount).toBe(totalShipSize)
   })
 })

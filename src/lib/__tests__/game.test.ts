@@ -1,10 +1,10 @@
-import { getGameKey, ships } from '@/lib/game'
+import { availableShips, getGameKey } from '@/lib/game'
 import { User } from '@/lib/user'
 import { Orientation, ShipType } from '@/types'
 
 describe('game.actions.ts', () => {
   it('has correct ships array', () => {
-    expect(ships).toEqual([
+    expect(availableShips).toEqual([
       {
         id: 'carrier',
         type: ShipType.Carrier,

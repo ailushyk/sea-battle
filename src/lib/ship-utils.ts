@@ -18,6 +18,24 @@ export function getShipCellIds(currentShip: ShipValue, position: Position) {
   })
 }
 
+export function getShipPositions(
+  currentShip: ShipValue,
+  position: Position,
+): Position[] {
+  return Array.from({ length: currentShip.size }, (_, i) => {
+    if (currentShip.orientation === Orientation.Horizontal) {
+      return {
+        row: position.row,
+        col: position.col + i,
+      }
+    }
+    return {
+      row: position.row + i,
+      col: position.col,
+    }
+  })
+}
+
 export function validateShipPosition({
   grid,
   ship,

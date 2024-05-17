@@ -1,75 +1,81 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
 
-import { battlefieldConfig, generateRandomGrid } from '@/lib/battlefield'
-import { ships } from '@/lib/game'
-import { cn } from '@/lib/utils'
+import { availableShips } from '@/lib/game'
 import { startGameAction } from '@/actions/game.actions'
-import { BattleField } from '@/components/battle-field'
+import {
+  BattleField,
+  BattleFieldBody,
+  BattleFieldCell,
+  BattleFieldCellPreview,
+  BattleFieldColsHeader,
+  BattleFieldRow,
+  BattleFieldRowHeader,
+} from '@/components/battle-field'
+import { AvailableShips } from '@/components/setting-up/available-ships'
 import { PreviewSelectedShip } from '@/components/setting-up/preview-selected-ship'
 import { useSettingUp } from '@/components/setting-up/use-setting-up'
-import { Ship, ShipLabel } from '@/components/ship'
 import { Button } from '@/components/ui/button'
+import { GameState, Ships } from '@/types'
 
-export function SettingUpShips() {
-  const router = useRouter()
+export function SettingUpShips({
+  game,
+  initShips,
+}: {
+  game: GameState
+  initShips?: Ships
+}) {
   const {
     grid,
     currentShip,
-    selected,
+    ships,
     selectCurrentShip,
     addShip,
-    checkField,
+    getPreviewCellValue,
+    preview,
     rotateShip,
     removeShip,
     reset,
     resetValidation,
-  } = useSettingUp(battlefieldConfig)
+  } = useSettingUp({ game, initShips })
 
   return (
     <div className="space-y-8">
       <h1>Ships</h1>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          {ships.map((ship) => (
-            <div key={ship.id}>
-              <ShipLabel ship={ship} />
-              <div className="flex items-center gap-2">
-                <Ship
-                  ship={ship}
-                  active={currentShip?.id === ship.id}
-                  disabled={selected.includes(ship.id)}
-                  onClick={() => selectCurrentShip(ship)}
-                />
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  disabled={!selected.includes(ship.id)}
-                  className={cn('h-8 w-8', {
-                    invisible: !selected.includes(ship.id),
-                  })}
-                  onClick={() => removeShip(ship)}
-                >
-                  x
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-
+        <AvailableShips
+          active={currentShip}
+          positioned={ships}
+          onActive={selectCurrentShip}
+          onRemove={removeShip}
+        />
         <PreviewSelectedShip ship={currentShip} rotateShip={rotateShip} />
       </div>
 
       <div className="flex justify-center">
-        <BattleField
-          grid={grid}
-          onClick={addShip}
-          onHover={checkField}
-          onBlur={resetValidation}
-        />
+        <BattleField>
+          <BattleFieldColsHeader cols={game.cols} />
+          {grid.map((cells, row) => (
+            <BattleFieldRow key={`row-${row}`}>
+              <BattleFieldRowHeader row={row} />
+              <BattleFieldBody onBlur={resetValidation}>
+                {cells.map((cell, _col) => (
+                  <div key={cell.id} className="relative">
+                    <BattleFieldCell cell={cell} />
+                    <BattleFieldCellPreview
+                      value={getPreviewCellValue(cell.position)}
+                      className="absolute inset-0"
+                      onClick={() => addShip({ position: cell.position })}
+                      onHover={() => preview({ position: cell.position })}
+                    />
+                  </div>
+                ))}
+              </BattleFieldBody>
+            </BattleFieldRow>
+          ))}
+        </BattleField>
       </div>
 
       <div className="flex justify-center gap-4">
@@ -78,11 +84,9 @@ export function SettingUpShips() {
         </Button>
         <Button
           size="lg"
-          disabled={selected.length !== ships.length}
+          disabled={ships.length !== availableShips.length}
           onClick={async () => {
-            console.log('use server')
-            await startGameAction({ grid })
-            router.push('/playground')
+            await startGameAction({ game, ships })
           }}
         >
           Start
