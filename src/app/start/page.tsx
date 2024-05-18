@@ -4,7 +4,10 @@ import { v4 } from 'uuid'
 import { getRedisKey } from '@/lib/game'
 import { redis } from '@/lib/redis'
 import { getUser } from '@/lib/user'
-import { SettingUpShips } from '@/components/setting-up/setting-up-ships'
+import { AvailableShips } from '@/components/setting-up/available-ships'
+import { PreviewSelectedShip } from '@/components/setting-up/preview-selected-ship'
+import { SettingUpField } from '@/components/setting-up/setting-up-field'
+import { SettingUpProvider } from '@/components/setting-up/setting-up-provider'
 import { GameState, Ships } from '@/types'
 
 function createGame({
@@ -35,10 +38,22 @@ export default async function Page() {
     }
   }
   const game = createGame({ userId: user.id, gameId })
+
   return (
-    <div className="container max-w-lg">
-      <h1>Start</h1>
-      <SettingUpShips game={game} initShips={initShips} />
-    </div>
+    <SettingUpProvider game={game} initShips={initShips}>
+      <div className="container max-w-lg">
+        <h1>Start</h1>
+        <div className="space-y-8">
+          <h1>Ships</h1>
+
+          <div className="grid grid-cols-2 gap-4">
+            <AvailableShips />
+            <PreviewSelectedShip />
+          </div>
+
+          <SettingUpField />
+        </div>
+      </div>
+    </SettingUpProvider>
   )
 }

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+'use client'
+
+import { createContext, useContext, useState } from 'react'
 
 import { generateGridView } from '@/lib/battlefield'
 import { getShipPositions, validateShipPosition } from '@/lib/ship-utils'
@@ -8,11 +10,59 @@ import {
   Orientation,
   Position,
   PositionValidationValue,
+  Ships,
   ShipValue,
   ValidatedPosition,
 } from '@/types'
 
-export function useSettingUp({
+interface SettingUpContextType {
+  game: GameState
+  grid: Grid
+  ships: Ships
+  currentShip: ShipValue | null
+
+  selectCurrentShip: (ship: ShipValue) => void
+  addShip: (params: { position: Position }) => void
+  showPreview: (params: { position: Position }) => void
+  getPreviewCellValue: (position: Position) => PositionValidationValue
+  rotateShip: (ship: ShipValue) => void
+  removeShip: (ship: ShipValue) => void
+  reset: () => void
+  resetValidation: () => void
+}
+
+const SettingUpContext = createContext<SettingUpContextType>(null!)
+
+export const useSettingUp = () => {
+  const context = useContext(SettingUpContext)
+  if (!context) {
+    throw new Error('useSettingUp must be used within a SettingUpProvider')
+  }
+  return context
+}
+
+export const SettingUpProvider = ({
+  game,
+  initShips,
+  children,
+}: {
+  game: GameState
+  initShips?: ShipValue[]
+  children: React.ReactNode
+}) => {
+  const value = useSettingUp_deprecated({
+    game,
+    initShips,
+  })
+
+  return (
+    <SettingUpContext.Provider value={{ game, ...value }}>
+      {children}
+    </SettingUpContext.Provider>
+  )
+}
+
+export function useSettingUp_deprecated({
   game,
   initShips,
 }: {
@@ -37,7 +87,7 @@ export function useSettingUp({
     })
   }
 
-  function preview({ position }: { position: Position }) {
+  function showPreview({ position }: { position: Position }) {
     if (!currentShip || !position) return
     const ship = currentShip
     // Get the cell IDs where the ship would be if placed at the given position
@@ -123,7 +173,7 @@ export function useSettingUp({
     selectCurrentShip,
     addShip,
     getPreviewCellValue,
-    preview,
+    showPreview,
     rotateShip,
     removeShip,
     reset,

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Suspense, useRef } from 'react'
 
 export function RenderCounter() {

@@ -5,24 +5,17 @@ import { getRedisKey } from '@/lib/game'
 import { redis } from '@/lib/redis'
 import { getGameId, getUser } from '@/lib/user'
 import { hitAction } from '@/actions/game.actions'
-import {
-  BattleField,
-  BattleFieldBody,
-  BattleFieldCell,
-  BattleFieldColsHeader,
-  BattleFieldGap,
-  BattleFieldRow,
-  BattleFieldRowHeader,
-} from '@/components/battle-field'
+import { BattleField } from '@/components/battle-field/battle-field'
+import { BattleFieldBody } from '@/components/battle-field/battle-field-body'
+import { BattleFieldCell } from '@/components/battle-field/battle-field-cell'
+import { BattleFieldColsHeader } from '@/components/battle-field/battle-field-cols-header'
+import { BattleFieldGap } from '@/components/battle-field/battle-field-gap'
+import { BattleFieldRow } from '@/components/battle-field/battle-field-row'
+import { BattleFieldRowHeader } from '@/components/battle-field/battle-field-row-header'
 import { Sea } from '@/components/sea'
 import { GameState, Ships, Shots } from '@/types'
 
 export const revalidate = 0
-
-const battlefieldConfig = {
-  rows: 10,
-  cols: 10,
-}
 
 export default async function Page() {
   const user = getUser()

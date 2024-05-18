@@ -1,28 +1,24 @@
-import { Ship, ShipLabel } from '@/components/ship'
-import { ShipValue } from '@/types'
+'use client'
 
-export function PreviewSelectedShip({
-  ship,
-  rotateShip,
-}: {
-  ship: ShipValue | null
-  rotateShip: (ship: ShipValue) => void
-}) {
-  if (!ship) return <div>Select a ship to preview</div>
+import { useSettingUp } from '@/components/setting-up/setting-up-provider'
+import { Ship, ShipLabel } from '@/components/ship'
+
+export function PreviewSelectedShip() {
+  const { currentShip, rotateShip } = useSettingUp()
+  if (!currentShip) return <div>Select a ship to preview</div>
 
   return (
     <div className="text-center">
-      <ShipLabel ship={ship} className="font-semibold" />
+      <ShipLabel ship={currentShip} className="font-semibold" />
       <div className="text-sm text-muted-foreground">
         Click on the ship to rotate it
       </div>
       <div className="flex h-48 items-center justify-center">
         <Ship
-          ship={ship}
+          ship={currentShip}
           active
           onClick={() => {
-            console.log("rotate ship's orientation")
-            rotateShip(ship)
+            rotateShip(currentShip)
           }}
         />
       </div>

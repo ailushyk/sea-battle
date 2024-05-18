@@ -1,25 +1,20 @@
+'use client'
+
 import React from 'react'
 import { XIcon } from 'lucide-react'
 
 import { availableShips } from '@/lib/game'
 import { cn } from '@/lib/utils'
+import { useSettingUp } from '@/components/setting-up/setting-up-provider'
 import { Ship, ShipLabel } from '@/components/ship'
 import { Button } from '@/components/ui/button'
 import { ShipValue } from '@/types'
 
-export function AvailableShips({
-  active,
-  positioned,
-  onActive,
-  onRemove,
-}: {
-  active: ShipValue | null
-  positioned: ShipValue[]
-  onActive(ship: ShipValue): void
-  onRemove(ship: ShipValue): void
-}) {
+export function AvailableShips() {
+  const { currentShip, ships, selectCurrentShip, removeShip } = useSettingUp()
+
   function isPositioned(ship: ShipValue) {
-    return !!positioned.find((s) => s.id === ship.id)
+    return !!ships.find((s) => s.id === ship.id)
   }
 
   return (
@@ -30,9 +25,9 @@ export function AvailableShips({
           <div className="flex items-center gap-2">
             <Ship
               ship={ship}
-              active={active?.id === ship.id}
+              active={currentShip?.id === ship.id}
               disabled={isPositioned(ship)}
-              onClick={() => onActive(ship)}
+              onClick={() => selectCurrentShip(ship)}
             />
             <Button
               size="icon"
@@ -41,7 +36,7 @@ export function AvailableShips({
                 invisible: !isPositioned(ship),
               })}
               disabled={!isPositioned(ship)}
-              onClick={() => onRemove(ship)}
+              onClick={() => removeShip(ship)}
             >
               <XIcon />
             </Button>
