@@ -1,52 +1,87 @@
-import { availableShips } from '@/lib/game'
+import { AVAILABLE_SHIPS } from '@/lib/game'
 import {
   getCellId,
   getShipCellIds,
-  getShipPositions,
-  validateShipPosition,
+  getShipCoordinates,
+  validateShipCoordinates,
 } from '@/lib/ship-utils'
 import {
   Cell,
+  Coordinate,
   GameState,
   Grid,
   Orientation,
-  Position,
   Ships,
   ShipValue,
   Shots,
-  ShotValue,
 } from '@/types'
 
 export const AI_USER_ID = 'ai'
 
-export function initBattlefield(rows: number, cols: number): Cell[][] {
+export function initBattlefield(rows: number, cols: number): Grid {
   return Array.from({ length: rows }, (_, row) =>
     Array.from({ length: cols }, (_, col) => {
-      const position = {
+      const coordinate = {
         row: row,
         col: col,
       }
       return {
-        id: getCellId(position),
-        ship: null,
-        hit: null,
-        position,
-      }
+        id: getCellId(coordinate),
+        coordinate,
+        value: null,
+      } satisfies Cell
     }),
   )
+}
+
+export function generateGridView({
+  game,
+  ships,
+  shots,
+}: {
+  game: Pick<GameState, 'rows' | 'cols'>
+  ships: Ships
+  shots?: Shots
+}) {
+  // create a grid with ships and shots
+  const grid = initBattlefield(game.rows, game.cols)
+  ships.forEach((ship) => {
+    ship.coordinates?.forEach((coordinate) => {
+      const cell = grid[coordinate.row][coordinate.col]
+      grid[coordinate.row][coordinate.col] = {
+        ...cell,
+        value: 'ship',
+      }
+    })
+  })
+  // add shots to the grid
+  if (shots) {
+    shots.forEach(({ coordinate }) => {
+      const cell = grid[coordinate.row][coordinate.col]
+      grid[coordinate.row][coordinate.col] = {
+        ...cell,
+        value: cell.value === 'ship' ? 'hit' : 'missed',
+      }
+    })
+  }
+  return grid
 }
 
 export function addShipToGrid({
   grid,
   ship,
-  position,
+  coordinate,
 }: {
   grid: Cell[][]
   ship: ShipValue
-  position: Position
+  coordinate: Coordinate
 }) {
-  const ids = getShipCellIds(ship, position)
-  const validation = validateShipPosition({ grid, ship, position })
+  const ids = getShipCellIds(ship, coordinate)
+  const validation = validateShipCoordinates({
+    grid,
+    ship,
+    coordinate: coordinate,
+  })
   if (!validation) {
     return grid
   }
@@ -65,119 +100,9 @@ export function addShipToGrid({
   )
 }
 
-export function resetGridValidation(grid: Cell[][]) {
-  return grid.map((row) =>
-    row.map((col) => {
-      if (col.validation) {
-        return {
-          ...col,
-          validation: null,
-        }
-      }
-      return col
-    }),
-  )
-}
-
-export function generateGridView(
-  {
-    game,
-    ships,
-    shots,
-  }: {
-    game: GameState
-    ships: Ships
-    shots?: Shots
-  },
-  options?: { ship?: ShipValue; position?: Position },
-) {
-  // create a grid with ships and shots
-  const grid = initBattlefield(game.rows, game.cols)
-  ships.forEach((ship) => {
-    ship.positions.forEach((position) => {
-      const cell = grid[position.row][position.col]
-      grid[position.row][position.col] = {
-        ...cell,
-        ship: ship.id,
-      }
-    })
-  })
-  // add shots to the grid
-  if (shots) {
-    shots.forEach(({ position }) => {
-      const cell = grid[position.row][position.col]
-      grid[position.row][position.col] = {
-        ...cell,
-        hit: ships.some((ship) =>
-          ship.positions.some(
-            (pos) => pos.row === position.row && pos.col === position.col,
-          ),
-        )
-          ? 'hit'
-          : 'missed',
-      }
-    })
-  }
-  if (options?.ship && options?.position) {
-    // validate if the ship can be placed on the grid
-    // add a preview of the ship
-  }
-  return grid
-}
-
-export function addPreviewShipPosition({
-  grid,
-  ship,
-  position,
-}: {
-  grid: Cell[][]
-  ship: ShipValue
-  position: Position
-}): Grid {
-  // Get the cell IDs where the ship would be if placed at the given position
-  const ids = getShipCellIds(ship, position)
-  // Validate if the ship can be placed at the given position
-  const validation = validateShipPosition({ grid, ship, position })
-  // Reset the validation of the grid
-  const _grid = resetGridValidation(grid)
-
-  // Map through the grid and update the cells where the ship would be placed
-  return _grid.map((row) =>
-    row.map((cell) => {
-      if (ids.includes(cell.id)) {
-        // If the cell is where the ship would be placed, update its validation
-        return {
-          ...cell,
-          validation: validation ? 'valid' : 'invalid',
-        }
-      }
-      // If the cell is not where the ship would be placed, keep its validation null
-      return { ...cell, validation: null }
-    }),
-  )
-}
-
-export function removeShipFromGrid({
-  grid,
-  ship,
-}: {
-  grid: Cell[][]
-  ship: ShipValue
-}) {
-  return grid.map((row) =>
-    row.map((col) => {
-      if (col.ship === ship.id) {
-        return {
-          ...col,
-          ship: null,
-          validation: null,
-        }
-      }
-      return col
-    }),
-  )
-}
-
+/**
+ * @deprecated
+ */
 function placeAIShipOnGrid(grid: Grid, ship: ShipValue): ShipValue {
   for (let i = 0; i < 100; i++) {
     const _ship = {
@@ -186,15 +111,23 @@ function placeAIShipOnGrid(grid: Grid, ship: ShipValue): ShipValue {
         Math.random() > 0.5 ? Orientation.Horizontal : Orientation.Vertical,
     }
     // limit the number of attempts to 100
-    const position = {
+    const coordinate = {
       row: Math.floor(Math.random() * grid.length),
       col: Math.floor(Math.random() * grid[0].length),
     }
-    const validation = validateShipPosition({ grid, ship: _ship, position })
+    const validation = validateShipCoordinates({
+      grid,
+      ship: _ship,
+      coordinate,
+    })
     if (validation) {
       return {
         ..._ship,
-        positions: getShipPositions(_ship, position),
+        coordinates: getShipCoordinates({
+          orientation: _ship.orientation,
+          size: _ship.size,
+          coordinate,
+        }),
       }
     }
   }
@@ -202,19 +135,11 @@ function placeAIShipOnGrid(grid: Grid, ship: ShipValue): ShipValue {
 }
 
 export function generateAIShips(game: GameState): Ships {
-  return availableShips.reduce((ships: Ships, ship: ShipValue) => {
+  return AVAILABLE_SHIPS.reduce((ships: Ships, ship: ShipValue) => {
     const grid = generateGridView({ game, ships })
     const newShip = placeAIShipOnGrid(grid, ship)
     return [...ships, newShip]
   }, [])
-}
-
-export function hitCell(grid: Grid, position: Position): ShotValue {
-  const cell = grid[position.row][position.col]
-  if (cell.ship) {
-    return 'hit'
-  }
-  return 'missed'
 }
 
 export function getShotsByUser({

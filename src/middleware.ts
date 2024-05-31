@@ -1,21 +1,29 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { v4 } from 'uuid'
 
-import { SEA_BATTLE_USER_KEY } from '@/lib/user'
+import { auth, refresh, setUserToken } from '@/lib/auth'
 
-export function middleware(request: NextRequest) {
-  let cookie = request.cookies.get(SEA_BATTLE_USER_KEY)
-  const response = NextResponse.next()
-  if (!cookie) {
-    response.cookies.set({
-      name: SEA_BATTLE_USER_KEY,
-      value: v4(),
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-    })
+export async function middleware(request: NextRequest) {
+  console.log('middleware', request.url)
+  const publicRoutes = ['/']
+
+  if (publicRoutes.includes(request.nextUrl.pathname)) {
+    return NextResponse.next()
   }
 
-  return response
+  const user = auth()
+  if (!user || user.exp * 1000 < Date.now()) {
+    // refresh token if it's possible
+    const token = await refresh()
+    if (!token) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    const response = NextResponse.next()
+    setUserToken(token, response.cookies)
+    return response
+  }
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
 }

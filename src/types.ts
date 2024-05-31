@@ -1,85 +1,55 @@
-export type Player = {
-  id: string
-  name: string
-  currentGame: string // id of the game
-}
-export type ShotValue = 'hit' | 'missed' | null
-export type Shot = {
-  user: string
-  position: Position
-  hit: ShotValue
-  timestamp: number
-}
-export type Shots = Array<Shot>
-// TODO: rename to Ship
-export type ShipValue = {
-  id: string
-  type: ShipType
-  orientation: Orientation // TODO: rename to direction
-  positions: Position[]
-  // TODO: remove
-  size: number
-  cells?: Cell[]
-  hits?: boolean[]
-}
-export type Ships = Array<ShipValue>
 export type GameState = {
   id: string
   players: string[] // player ids
   rows: number
   cols: number
   timestamp: number
-  status: 'setting-up' | 'playing' | 'finished'
+  status: 'idle' | 'started' | 'finished'
 }
 
-// gameId:player1:ships
-// gameId:player2:ships
-// gameId:shots
-
-/**
- * The types below are used in the Battleship game, deprecated
- */
-
-export type Hit = {
-  player: string
-  row: number
-  col: number
-}
-export enum ShipType {
+export enum ShipSize {
   Carrier = 5,
   Battleship = 4,
   Cruiser = 3,
   Submarine = 3,
   Destroyer = 2,
 }
+
 export enum Orientation {
-  Horizontal,
-  Vertical,
+  Horizontal = 'horizontal',
+  Vertical = 'vertical',
 }
-export type Position = {
+
+export type Coordinate = {
   row: number
   col: number
 }
-export interface ValidatedPosition extends Position {
-  valid: 'valid' | 'invalid' | null
+
+export type ShipValue = {
+  id: string
+  label: string
+  size: number
+  orientation: Orientation // TODO: rename to direction
+  coordinates: Coordinate[]
+  status: 'idle' | 'placed' | 'sunk'
 }
 
-export type PositionValidationValue = 'valid' | 'invalid' | null | undefined
+export type Ships = Array<ShipValue>
+
+export type ShotValue = 'hit' | 'missed'
+export type Shot = {
+  user: string
+  coordinate: Coordinate
+  hit: ShotValue
+  timestamp: number
+}
+export type Shots = Array<Shot>
+
+export type PositionValidationValue = 'valid' | 'invalid' | null
+export type CellValue = 'ship' | 'hit' | 'missed' | null
 export type Cell = {
   id: string
-  position: Position
-  ship: string | null // ship id
-  hit: ShotValue
-  validation?: PositionValidationValue
+  coordinate: Coordinate
+  value: CellValue
 }
 export type Grid = Cell[][]
-
-export type Game = {
-  id: string
-  status: 'setting-up' | 'playing' | 'finished'
-  players: string[]
-  hits: Hit[]
-  currentTurn?: string
-  grid: Cell[][]
-  aiGrid: Cell[][]
-}

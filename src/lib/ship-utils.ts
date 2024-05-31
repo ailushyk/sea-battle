@@ -1,9 +1,9 @@
-import { Cell, Orientation, Position, ShipValue } from '@/types'
+import { Cell, Coordinate, Orientation, ShipValue } from '@/types'
 
-export const getCellId = (position: Position) =>
+export const getCellId = (position: Coordinate) =>
   `${position.row}-${position.col}`
 
-export function getShipCellIds(currentShip: ShipValue, position: Position) {
+export function getShipCellIds(currentShip: ShipValue, position: Coordinate) {
   return Array.from({ length: currentShip.size }, (_, i) => {
     if (currentShip.orientation === Orientation.Horizontal) {
       return getCellId({
@@ -18,40 +18,45 @@ export function getShipCellIds(currentShip: ShipValue, position: Position) {
   })
 }
 
-export function getShipPositions(
-  currentShip: ShipValue,
-  position: Position,
-): Position[] {
-  return Array.from({ length: currentShip.size }, (_, i) => {
-    if (currentShip.orientation === Orientation.Horizontal) {
+export function getShipCoordinates({
+  orientation,
+  size,
+  coordinate,
+}: {
+  orientation: Orientation
+  size: number
+  coordinate: Coordinate
+}): Coordinate[] {
+  return Array.from({ length: size }, (_, i) => {
+    if (orientation === Orientation.Horizontal) {
       return {
-        row: position.row,
-        col: position.col + i,
+        row: coordinate.row,
+        col: coordinate.col + i,
       }
     }
     return {
-      row: position.row + i,
-      col: position.col,
+      row: coordinate.row + i,
+      col: coordinate.col,
     }
   })
 }
 
-export function validateShipPosition({
+export function validateShipCoordinates({
   grid,
   ship,
-  position,
+  coordinate,
 }: {
   grid: Cell[][]
   ship: ShipValue
-  position: Position
+  coordinate: Coordinate
 }) {
-  const ids = getShipCellIds(ship, position)
+  const ids = getShipCellIds(ship, coordinate)
 
   return ids.every((id) => {
     const _cell = grid.flat().find((c) => c.id === id)
 
     if (!_cell) return false
 
-    return !_cell.ship
+    return !(_cell.value === 'ship')
   })
 }

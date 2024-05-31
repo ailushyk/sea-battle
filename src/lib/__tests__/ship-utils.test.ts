@@ -6,9 +6,9 @@ import { initBattlefield } from '@/lib/battlefield'
 import {
   getCellId,
   getShipCellIds,
-  validateShipPosition,
+  validateShipCoordinates,
 } from '@/lib/ship-utils'
-import { Position } from '@/types'
+import { Coordinate } from '@/types'
 
 describe('ship-utils', () => {
   it('Create a cell id from position', () => {
@@ -33,48 +33,50 @@ describe('validateField', () => {
 
   it('Success when a ship can be placed horizontally within the grid', () => {
     const ship = createHorizontalBattleship()
-    const position: Position = {
+    const position: Coordinate = {
       row: 0,
       col: 0,
     }
-    expect(validateShipPosition({ grid, ship, position })).toBe(true)
+    expect(validateShipCoordinates({ grid, ship, coordinate: position })).toBe(
+      true,
+    )
   })
 
   it('Fail when a ship cannot be placed horizontally within the grid', () => {
     const ship = createVerticalBattleship()
-    const position: Position = {
+    const position: Coordinate = {
       row: 8,
       col: 0,
     }
     expect(
-      validateShipPosition({
+      validateShipCoordinates({
         grid,
         ship,
-        position,
+        coordinate: position,
       }),
     ).toBe(false)
   })
 
   it('Success when a ship can be placed vertically within the grid', () => {
     const ship = createVerticalBattleship()
-    const position: Position = {
+    const position: Coordinate = {
       row: 0,
       col: 0,
     }
-    const result = validateShipPosition({ grid, ship, position })
+    const result = validateShipCoordinates({ grid, ship, coordinate: position })
     expect(result).toBe(true)
   })
 
   it('Fail when a ship cannot be placed vertically within the grid', () => {
     const shipVertical = createVerticalBattleship()
-    const position: Position = {
+    const position: Coordinate = {
       row: 8,
       col: 0,
     }
-    const result = validateShipPosition({
+    const result = validateShipCoordinates({
       grid,
       ship: shipVertical,
-      position,
+      coordinate: position,
     })
     expect(result).toBe(false)
   })
@@ -96,7 +98,11 @@ describe('validateField', () => {
         return cell
       })
     })
-    const result = validateShipPosition({ grid: gridWithShip, ship, position })
+    const result = validateShipCoordinates({
+      grid: gridWithShip,
+      ship,
+      coordinate: position,
+    })
     expect(result).toBe(false)
   })
 })

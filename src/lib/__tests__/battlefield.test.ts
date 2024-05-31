@@ -5,25 +5,25 @@ import {
   removeShipFromGrid,
   resetGridValidation,
 } from '@/lib/battlefield'
-import { Orientation, ShipType, ShipValue } from '@/types'
+import { Orientation, ShipSize, ShipValue } from '@/types'
 
 export function createHorizontalBattleship(): ShipValue {
   return {
     id: 'test-horizontal-ship',
-    type: ShipType.Battleship,
-    size: ShipType.Battleship,
+    type: ShipSize.Battleship,
+    size: ShipSize.Battleship,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
   }
 }
 
 export function createVerticalBattleship(): ShipValue {
   return {
     id: 'test-vertical-ship',
-    type: ShipType.Battleship,
-    size: ShipType.Battleship,
+    type: ShipSize.Battleship,
+    size: ShipSize.Battleship,
     orientation: Orientation.Vertical,
-    positions: [],
+    coordinates: [],
   }
 }
 
@@ -55,7 +55,7 @@ describe('init-battlefield', () => {
     const gridWithShip = addShipToGrid({
       grid,
       ship,
-      position,
+      coordinate: position,
     })
     expect(gridWithShip[0][0]).toEqual({
       id: '0-0',
@@ -79,7 +79,7 @@ describe('init-battlefield', () => {
     const gridWithShip = addShipToGrid({
       grid,
       ship,
-      position,
+      coordinate: position,
     })
     expect(gridWithShip[9][9]).toEqual({
       id: '9-9',
@@ -103,7 +103,7 @@ describe('init-battlefield', () => {
     const gridWithShip = addShipToGrid({
       grid,
       ship: shipH,
-      position,
+      coordinate: position,
     })
     expect(gridWithShip[0][0]).toEqual({
       id: '0-0',
@@ -118,7 +118,7 @@ describe('init-battlefield', () => {
     const gridWithShip2 = addShipToGrid({
       grid: gridWithShip,
       ship: shipV,
-      position,
+      coordinate: position,
     })
     expect(gridWithShip2[0][0]).toEqual({
       id: '0-0',
@@ -205,7 +205,7 @@ describe('init-battlefield', () => {
     const gridWithShip = addShipToGrid({
       grid,
       ship,
-      position,
+      coordinate: position,
     })
     expect(gridWithShip[0][0]).toEqual({
       id: '0-0',

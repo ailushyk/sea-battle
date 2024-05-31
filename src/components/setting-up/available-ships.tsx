@@ -3,46 +3,45 @@
 import React from 'react'
 import { XIcon } from 'lucide-react'
 
-import { availableShips } from '@/lib/game'
+import { AVAILABLE_SHIPS } from '@/lib/game'
 import { cn } from '@/lib/utils'
 import { useSettingUp } from '@/components/setting-up/setting-up-provider'
 import { Ship, ShipLabel } from '@/components/ship'
 import { Button } from '@/components/ui/button'
-import { ShipValue } from '@/types'
 
 export function AvailableShips() {
-  const { currentShip, ships, selectCurrentShip, removeShip } = useSettingUp()
-
-  function isPositioned(ship: ShipValue) {
-    return !!ships.find((s) => s.id === ship.id)
-  }
+  const { ships, active, select, remove } = useSettingUp()
 
   return (
     <div>
-      {availableShips.map((ship) => (
-        <div key={ship.id}>
-          <ShipLabel ship={ship} />
-          <div className="flex items-center gap-2">
-            <Ship
-              ship={ship}
-              active={currentShip?.id === ship.id}
-              disabled={isPositioned(ship)}
-              onClick={() => selectCurrentShip(ship)}
-            />
-            <Button
-              size="icon"
-              variant="destructive"
-              className={cn('h-8 w-8', {
-                invisible: !isPositioned(ship),
-              })}
-              disabled={!isPositioned(ship)}
-              onClick={() => removeShip(ship)}
-            >
-              <XIcon />
-            </Button>
+      {AVAILABLE_SHIPS.map((ship) => {
+        const isPlaced = ships.find((s) => s.label.toLowerCase() === ship.id)
+        return (
+          <div key={ship.id}>
+            <ShipLabel>{ship.label}</ShipLabel>
+            <div className="flex items-center gap-2">
+              <Ship
+                orientation={ship.orientation}
+                size={ship.size}
+                active={active?.id === ship.id}
+                disabled={!!isPlaced}
+                onClick={() => select(ship)}
+              />
+              {isPlaced && (
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="h-6 w-6"
+                  disabled={!isPlaced}
+                  onClick={() => remove(isPlaced?.id)}
+                >
+                  <XIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

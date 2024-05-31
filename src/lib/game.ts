@@ -1,57 +1,44 @@
-import { cookies } from 'next/headers'
+import { Orientation, ShipSize, ShipValue } from '@/types'
 
-import { User } from '@/lib/user'
-import { Orientation, ShipType, ShipValue } from '@/types'
-
-export const availableShips: ShipValue[] = [
+export const AVAILABLE_SHIPS: ShipValue[] = [
   {
     id: 'carrier',
-    type: ShipType.Carrier,
-    size: ShipType.Carrier,
+    label: 'Carrier',
+    size: ShipSize.Carrier,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
+    status: 'idle',
   },
   {
     id: 'battleship',
-    type: ShipType.Battleship,
-    size: ShipType.Battleship,
+    label: 'Battleship',
+    size: ShipSize.Battleship,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
+    status: 'idle',
   },
   {
     id: 'cruiser',
-    type: ShipType.Cruiser,
-    size: ShipType.Cruiser,
+    label: 'Cruiser',
+    size: ShipSize.Cruiser,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
+    status: 'idle',
   },
   {
     id: 'submarine',
-    type: ShipType.Submarine,
-    size: ShipType.Submarine,
+    label: 'Submarine',
+    size: ShipSize.Submarine,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
+    status: 'idle',
   },
   {
     id: 'destroyer',
-    type: ShipType.Destroyer,
-    size: ShipType.Destroyer,
+    label: 'Destroyer',
+    size: ShipSize.Destroyer,
     orientation: Orientation.Horizontal,
-    positions: [],
+    coordinates: [],
+    status: 'idle',
   },
 ]
-
-export const getGameKey = ({ user }: { user: User }, subKey?: string) => {
-  //TODO: use game id instead of user id
-  const key = `sb:game:${user.id}`
-  return subKey ? `${key}:${subKey}` : key
-}
-
-export function getRedisKey(
-  gameId: string,
-  userId: string,
-  subKey?: 'ships' | 'ai' | 'shots',
-): string {
-  const key = `${gameId}:${userId}`
-  return subKey ? `${key}:${subKey}` : key
-}

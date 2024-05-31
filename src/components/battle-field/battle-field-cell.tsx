@@ -3,7 +3,7 @@
 import { CircleIcon, XIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { Cell, Position } from '@/types'
+import { Cell, Coordinate, ShotValue } from '@/types'
 
 export const BattleFieldCell = ({
   cell,
@@ -15,11 +15,11 @@ export const BattleFieldCell = ({
   cell: Cell
   hide?: boolean
   children?: React.ReactNode
-  onClick?({ position }: { position: Position }): void
+  onClick?({ position }: { position: Coordinate }): void
   onHover?(): void
 }) => {
   const Component = onClick ? 'button' : 'div'
-  const hit = cell.hit
+  const hit = cell.value
   return (
     <Component
       className={cn(
@@ -30,7 +30,7 @@ export const BattleFieldCell = ({
           'bg-gray-300/30': hit === 'missed',
         },
       )}
-      onClick={() => onClick?.({ position: cell.position })}
+      onClick={() => onClick?.({ position: cell.coordinate })}
       onMouseEnter={onHover}
     >
       {children || hit === 'hit' ? (

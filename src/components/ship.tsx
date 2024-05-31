@@ -1,22 +1,24 @@
 import React from 'react'
 
 import { cn } from '@/lib/utils'
-import { Orientation, ShipType, ShipValue } from '@/types'
+import { Orientation } from '@/types'
 
 export function Ship({
-  ship,
+  children,
+  orientation,
+  size,
   active,
   disabled,
-  children,
   className,
   onClick,
 }: {
-  ship: ShipValue
   children?: React.ReactNode
+  orientation: Orientation
+  size: number
   active?: boolean
   disabled?: boolean
   className?: string
-  onClick(): void
+  onClick?(): void
 }) {
   return (
     <div className={cn(className)}>
@@ -24,12 +26,12 @@ export function Ship({
         className={cn('flex', {
           'bg-blue-500': active,
           'bg-gray-200/30': disabled,
-          'flex-col': ship?.orientation === Orientation.Vertical,
+          'flex-col': orientation === Orientation.Vertical,
         })}
         disabled={disabled}
         onClick={onClick}
       >
-        {Array.from({ length: ship.size }).map((_, i) => (
+        {Array.from({ length: size }).map((_, i) => (
           <div
             key={i}
             className={cn(
@@ -45,11 +47,11 @@ export function Ship({
 }
 
 export function ShipLabel({
-  ship,
+  children,
   className,
 }: {
-  ship: ShipValue
+  children?: React.ReactNode
   className?: string
 }) {
-  return <div className={className}>{ShipType[ship.type]}</div>
+  return <div className={className}>{children}</div>
 }
